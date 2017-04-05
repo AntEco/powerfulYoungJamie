@@ -1,12 +1,35 @@
+from urllib.parse import quote_plus
+
 import praw
 
-reddit = praw.Reddit(user_agent='JREsmoove v0.1',
-client_id='DjnggMIzZFtkRQ',
-client_secret='noCULv4ERlbodrfykF7PKCXodN4',
-username='smoove',
-password='Three-333')
+JOESCOMMANDS = ["pull that shit up jamie", "jamie pull that up", "pull that up jamie"]
+REPLY_TEMPLATE = '[Let me google that for you](http://lmgtfy.com/?q={})'
 
-subreddit = reddit.subreddit("RedditDiamond")
+def main():
+    reddit = praw.Reddit(user_agent='JreBot v0.1',
+        client_id='AiQKE4vZ4T831w',
+        client_secret='hDsRBZyZU5AL4y0EfmqG7qFdJqs',
+        username='PowerfulYoungJamie',
+        password='The Joe Rogan')
 
-for submission in subreddit.hot(limit=10):
-    print(submission.title)
+    subreddit = reddit.subreddit("RedditDiamond")
+    for submission in subreddit.stream.submissions():
+    	process_submission(submission)
+
+
+def process_submission(submission):
+
+    if len(submission.title.split()) > 10:
+            return
+        
+    normalized_title = submission.title.lower()
+    for questionPhrase in JOESCOMMANDS:
+        if questionPhrase in normalized_title:
+            url_title = quote_plus(submission.title)
+            reply_text = REPLY_TEMPLATE.format(url_title)
+            print('Replying to: {}'.format(submission.title))
+            submission.reply(reply_text)
+            break
+
+if __name__ == '__main__':
+    main()
